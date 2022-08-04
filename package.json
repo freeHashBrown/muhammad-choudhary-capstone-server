@@ -5,14 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index"
+    "start": "nodemon index",
+    "migrate": "knex migrate:latest",
+    "seed": "knex seed:run"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "casual": "^1.6.2",
     "cors": "^2.8.5",
     "express": "^4.18.1",
+    "knex": "^2.2.0",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.19"
   }
 }
