@@ -15,6 +15,7 @@ exports.seed = function(knex) {
       // Then create a mock user (so we have more than one account for testing posts)
       return knex('users')
         .insert({ 
+          id: 1,
           google_id: "google_id",
           avatar_url: 'wwww.google_id.com',
           username: 'google-user'
