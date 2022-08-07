@@ -41,43 +41,66 @@ app.use(expressSession({
 
 app.use(cookieParser(process.env.SECRET));
 
+
+//Setting Up Passport
+app.use(passport.initialize());
+app.use(passport.session());
+require("./setUpPassport")(passport);
+
+
+
+
+
 //Routes
-app.post("/login", (req, res) => {
-  console.log(req.body);
-  return;
-})
+app.post("/login", (req, res, next) => {
+  
+  //authenticate user using local strategy 
+  passport.authenticate("local", (err, user, info) => {
+
+    //Throw an error found
+    if (err) {
+      throw err;
+    }
+
+    if (!user) {
+      res.send("Could not find user");
+    }
+
+    else {
+      req.logIn(user, err => {
+        if (err) {
+          throw err;
+        }
+
+        res.send("Login Success");
+        console.log(req.user);
+      })
+    }
+
+
+  })(req,res,next)
+});
 
 app.post("/signup", (req, res) => {
   
-  //Look for user if exists in the database
-  knex("users")
-  .select("username")
-  .where({username: req.body.username})
-  .then(user => {
-     
-    //If user is found, send an error saying user already exists
-    if (user.length){
-      return res.status(409).send("User already exists");
-    }
-    else{
+  username = req.body.username;
 
-      //encrypt the password before storing it
-      const encryptedPassword = bcrypt.hash(req.body.password, 10);
+    //Must encrypt the password before storing it in the database
+    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
-      //Create a user if not found
-      knex('users')
-      .insert({
-        username: req.body.username,
-        password: encryptedPassword
-      })
-
-      res.status(201).send("User created");
-    }
-      
+  //Create the user and insert it into database
+  knex('users')
+  .insert({
+    username: username,
+    password: hashedPassword
   })
-
-
-})
+  .then(() => {
+    res.status(201).send('Registered successfully');
+  })
+  .catch(err => {
+    res.status(400).json({ message: 'Failed registration', error: err.sqlMessage });
+  })
+});
 
 app.get("/user", (req, res) => {
   // console.log(req.body);
