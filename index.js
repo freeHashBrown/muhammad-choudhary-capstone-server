@@ -1,78 +1,88 @@
-// initialize Express in project
-const express = require('express');
-const app = express();
-
-const passport = require('passport');
-const passportLocal = require("passport-local").Strategy;
+//Imports 
+const express = require("express");
 const cors = require("cors");
 
-const cookieParser = require('cookie-parser');
+const passport = require("passport");
+const passportLocal = require("passport-local").Strategy;
+
+const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
-const bodyParser = require('body-parser');
+const expressSession = require("express-session");
 
-const expressSession = require('express-session');
-
-//Using the dotenv file 
-require('dotenv').config();
-
-
-
-//Middlewares
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true
-}))
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-app.use(expressSession({
-    secret: process.env.SECRET,
-    resave: true,
-    saveUninitialized: true
-
-}))
-
-app.use(cookieParser(process.env.SECRET));
-
-
+const bodyParser = require("body-parser");
 
 // Knex instance
 const knex = require('knex')(require('./knexfile.js').development);
 
-//Routes to register, login and get user info
-app.post("/register", (req, res) => {
+// Require .env files for environment variables (keys and secrets)
+require('dotenv').config();
 
-    username = req.body.username;
-    
-    //Must encrypt the password before storing it in the database
-    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+//Assign Port Number
+const PORT = process.env.PORT || 5050;
 
-  //Create the user and insert it into database
-  knex('users')
-  .insert({
-    username: username,
-    password: hashedPassword,
-    avatar_url: "local strategy"
-  })
-  .then(() => {
-    res.status(201).send('Registered successfully');
-  })
-  .catch(err => {
-    res.status(400).json({ message: 'Failed registration', error: err.sqlMessage });
-  })
+const app = express();
 
-});
+//Middlewares
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
+app.use(cors({
+  origin: true,
+  credentials: true
+}))
+
+app.use(expressSession({
+  secret: process.env.SECRET,
+  resave: true,
+  saveUninitialized: true
+}))
+
+app.use(cookieParser(process.env.SECRET));
+
+//Routes
 app.post("/login", (req, res) => {
-    console.log(req.body);
-});
-
-app.get("/user", (req, res) => {
-    console.log(req.body);
+  console.log(req.body);
+  return;
 })
 
+app.post("/signup", (req, res) => {
+  
+  //Look for user if exists in the database
+  knex("users")
+  .select("username")
+  .where({username: req.body.username})
+  .then(user => {
+     
+    //If user is found, send an error saying user already exists
+    if (user.length){
+      return res.status(409).send("User already exists");
+    }
+    else{
 
+      //encrypt the password before storing it
+      const encryptedPassword = bcrypt.hash(req.body.password, 10);
+
+      //Create a user if not found
+      knex('users')
+      .insert({
+        username: req.body.username,
+        password: encryptedPassword
+      })
+
+      res.status(201).send("User created");
+    }
+      
+  })
+
+
+})
+
+app.get("/user", (req, res) => {
+  // console.log(req.body);
+  return;
+})
 
 
 // start Express on port 8080
