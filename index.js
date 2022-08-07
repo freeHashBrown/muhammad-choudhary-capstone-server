@@ -102,10 +102,28 @@ app.post("/signup", (req, res) => {
   })
 });
 
+//After the user authenticated, the user is stored in the req.user
 app.get("/user", (req, res) => {
-  // console.log(req.body);
-  return;
-})
+  
+  //Send this user data
+  res.send(req.user)
+});
+
+// Logout endpoint
+app.get('/logout', (req, res) => {
+  // Passport adds the logout method to request, it will end user session
+  req.logout((error) => {
+      // This callback function runs after the logout function
+      if (error) {
+          return res.status(500).json({message: "Server error, please try again later", error: error});
+      }
+      // Redirect the user back to client-side application
+      res.redirect("http://localhost:3000/");
+  });
+});
+
+
+
 
 
 // start Express on port 8080

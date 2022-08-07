@@ -55,13 +55,16 @@ module.exports = function(passport) {
         cb(null, user.id)
     });
 
-    passport.deserializeUser((id, cb) => {
+    passport.deserializeUser((userId, cb) => {
 
         //Look through database
         knex("users")
         .where({id: userId})
         .then(user => {
-            done(null, user[0]);
+            const userInfo = {
+                username: user[0].username
+            };
+            cb(null, userInfo)
         })
         .catch(err => {
             console.log("Error finding user", err);
