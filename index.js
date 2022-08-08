@@ -134,8 +134,14 @@ app.get('/logout', (req, res) => {
   });
 });
 
+//Routes for the users
+const usersRoutes = require('./routes/usersRoute.js');
+app.use('/users', usersRoutes);
 
 
+// Routes for the posts
+const postsRoutes = require('./routes/postsRoute');
+app.use('/posts', postsRoutes);
 
 
 // start Express on port 8080
