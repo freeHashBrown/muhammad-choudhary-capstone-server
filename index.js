@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 const expressSession = require("express-session");
 
 const bodyParser = require("body-parser");
+const { authenticate } = require("passport");
 
 // Knex instance
 const knex = require('knex')(require('./knexfile.js').development);
@@ -22,14 +23,19 @@ const PORT = process.env.PORT || 5050;
 
 const app = express();
 
+
+
 //Middlewares
+// Enable req.body middleware
+app.use(express.json());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 
 app.use(cors({
-  origin: true,
+  origin: "http://localhost:3000",
   credentials: true
 }))
 
@@ -55,7 +61,7 @@ require("./setUpPassport")(passport);
 app.post("/login", (req, res, next) => {
   
   //authenticate user using local strategy 
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", { failureRedirect: '/login' }, (err, user) => {
 
     //Throw an error found
     if (err) {
@@ -73,12 +79,12 @@ app.post("/login", (req, res, next) => {
         }
 
         res.send("Login Success");
-        console.log(req.user);
+        
+        
       })
     }
-
-
   })(req,res,next)
+
 });
 
 app.post("/signup", (req, res) => {
@@ -104,9 +110,15 @@ app.post("/signup", (req, res) => {
 
 //After the user authenticated, the user is stored in the req.user
 app.get("/user", (req, res) => {
+
+  // console.log("/user endpoint being reached*****");
+  console.log(req.user, req.session);
   
-  //Send this user data
-  res.send(req.user)
+   // If `req.user` isn't found send back a 401 Unauthorized response
+   if (req.user === undefined) return res.status(401).json({ message: 'Unauthorized' });
+
+   // If user is currently authenticated, send back user info
+   res.status(200).json(req.user);
 });
 
 // Logout endpoint
