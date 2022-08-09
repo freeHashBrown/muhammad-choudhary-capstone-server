@@ -38,7 +38,6 @@ module.exports = function(passport) {
                 })
             });
 
-
         })
     )
 
@@ -50,16 +49,13 @@ module.exports = function(passport) {
     });
 
     passport.deserializeUser((userId, done) => {
-        console.log('deserializeUser (user id):$$$$', userId);
       
         // Query user information from the database for currently authenticated user
         knex('users')
           .where({ id: userId })
           .then(user => {
-            // Remember that knex will return an array of records, so we need to get a single record from it
-            console.log('req.user:', user[0]);
       
-            // The full user object will be attached to request object as `req.user`
+            //knex returns an array, therefore we must only select the first object in array
             done(null, user[0]);
           })
           .catch(err => {
