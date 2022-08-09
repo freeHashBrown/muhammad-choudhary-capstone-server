@@ -36,8 +36,43 @@ exports.addPost = (req, res) => {
         .insert(req.body)
         .then(data => {
 
-            //After posting, respond with all the data
-            res.status(201).json(data);
+            knex("posts")
+                .then(data => {
+                        //After posting, respond with all the data
+                        res.status(201).json(data);
+                })
 
         })
 }
+
+
+//Retrieving certain posts
+exports.userPosts = (req, res) => {
+    knex('posts')
+      .where({ user_id: req.params.id })
+      .then((data) => {
+        res.status(200).json(data);
+      })
+      .catch((err) =>
+        res
+          .status(400)
+          .send(
+            `Error retrieving posts ${req.params.id} ${err}`
+          )
+      );
+  };
+
+
+
+//Editing a post
+exports.updatePosts = (req, res) => {
+    knex('posts')
+      .update(req.body)
+      .where({ id: req.params.id })
+      .then(() => {
+        res.status(200).send(`Post with id: ${req.params.id} has been updated`);
+      })
+      .catch((err) =>
+        res.status(400).send(`Error updating Post ${req.params.id} ${err}`)
+      );
+  };

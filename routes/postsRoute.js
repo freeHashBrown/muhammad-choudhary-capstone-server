@@ -9,4 +9,13 @@ router.route('/').get(postsController.index);
 router.route('/').post(postsController.addPost);
 
 
+//Retrieving specific posts
+router.route("/:id").get(postsController.userPosts);
+
+//Editing a post
+router.route('/:id').put(postsController.updatePosts);
+
+//Deleting a post 
+
+
 module.exports = router;
