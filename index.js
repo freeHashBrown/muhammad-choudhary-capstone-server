@@ -19,7 +19,10 @@ const knex = require('knex')(require('./knexfile.js').development);
 require('dotenv').config();
 
 //Assign Port Number
-const PORT = process.env.PORT || 5050;
+//*************************** */
+//Please set the port number to 8080 because the frontend makes axios request to that port
+//************************ */
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 
@@ -142,7 +145,7 @@ const postsRoutes = require('./routes/postsRoute');
 app.use('/posts', postsRoutes);
 
 
-// start Express on port 8080
+// Start Express on port 8080
 app.listen(PORT, () => {
     console.log(`Server Started on http://localhost:${PORT}`);
 });

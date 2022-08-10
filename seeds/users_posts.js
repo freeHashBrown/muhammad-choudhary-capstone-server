@@ -21,6 +21,15 @@ exports.seed = function(knex) {
           password: ""
         });
     })
+    .then(()=> {
+      return knex('users')
+        .insert({ 
+          google_id: "",
+          avatar_url: "",
+          username: 'Hash123',
+          password: "$2a$10$6fr3Ww/YeBAPAI3tlyseYOz3VdIoekqBJ2zpcNj9wt3cMtyySzYNa"
+        });
+    })
     .then(() => {
 
       let mockPosts = [];
