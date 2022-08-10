@@ -76,3 +76,18 @@ exports.updatePosts = (req, res) => {
         res.status(400).send(`Error updating Post ${req.params.id} ${err}`)
       );
   };
+
+
+//Delete a post
+exports.deletePosts = (req, res) => {
+  knex('posts')
+    .delete() 
+    .where({ id: req.params.id })
+    .then(() => {
+      // For DELETE response we can use 204 status code
+      res.status(204).send(`Post with id: ${req.params.id} has been deleted`);
+    })
+    .catch((err) =>
+      res.status(400).send(`Error deleting Post ${req.params.id} ${err}`)
+    );
+};
