@@ -56,7 +56,7 @@ Get "/login" will login a user
 
 Get "/signup" will signup a user
 
-#Lessons learned & next steps
+# Lessons learned & next steps
 The passport.js local strategy is very complex and it must be 
 studied further. I want to add Google, Github and Facebook login.
 I also want to complete the register feature for passport.js
